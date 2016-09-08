@@ -38,10 +38,10 @@ function updateCurrentValues(response)
 	var row = document.createElement('div');
 	row.className = "row";
 	row.setAttribute("id", "currentValuesRow");
-	for(let sensor of data.messures)
+	for(sensor of data.messures)
 	{
 		var card = document.createElement('div');
-		card.className = "card col s12 m6";
+		card.className = "card col s6";
 		var cardImage = document.createElement('div');
 		cardImage.className = "card-image center";
 		var image = document.createElement('i');
@@ -110,7 +110,7 @@ function ajaxQuery(action, queryText, optParam)
             break;
     }
 
-    var url="/remote.php?action="+action;
+    var url="./remote.php?action="+action;
 	showDebug('Send the following Data{"url":"'+url+'","type":"'+type+'","data":"'+JSON.stringify(JSONData)+'"}');
     $.ajax({
         url: url,
