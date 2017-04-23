@@ -1,6 +1,8 @@
 <!DOCTYPE HTML>
 <html lang="de">
 <head>
+	<!-- Include jqPlot CSS -->
+	<link rel="stylesheet" type="text/css" href="assets/css/jquery.jqplot.css" />
 	<!-- include custom CSS -->
 		<link type="text/css" rel="stylesheet" href="assets/css/webui.css"/>
     <!--Import materialize.css-->
@@ -21,10 +23,15 @@
 <div id="vlaueContainer" class="container">
 	
 </div>
-
 <!--Import jQuery before materialize.js-->
-	<script type="text/javascript" src="assets/js/jquery-2.1.1.min.js"></script>
+	<script type="text/javascript" src="assets/js/jquery-3.2.1.min.js"></script>
+	<!--[if lt IE 9]><script language="javascript" type="text/javascript" src="assets/js/excanvas.js"></script><![endif]-->
+	<script language="javascript" type="text/javascript" src="assets/js/jquery.jqplot.min.js"></script>
+	<script language="javascript" type="text/javascript" src="assets/js/jqplot_plugins/jqplot.dateAxisRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="assets/js/jqplot_plugins/jqplot.canvasAxisTickRenderer.js"></script>
+	<script language="javascript" type="text/javascript" src="assets/js/jqplot_plugins/jqplot.highlighter.js"></script>
+	<script language="javascript" type="text/javascript" src="assets/js/jqplot_plugins/jqplot.canvasTextRenderer.js"></script>
 	<script type="text/javascript" src="assets/js/materialize.min.js"></script>
 	<script type="text/javascript" src="assets/js/webui.js"></script>
-</body>
+	</body>
 </html>

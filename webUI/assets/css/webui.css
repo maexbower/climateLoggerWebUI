@@ -123,3 +123,7 @@ div#imageblock > div.card > div.card-action > div.input-field {
 	padding: 0 0.2em;
 	margin: 0 0.5em;
 }
+.graphcontainer{
+    height:400px;
+    width:300px
+}
