@@ -1,8 +1,8 @@
 #!/bin/bash
-DHTEXEC="/usr/bin/lol_dht22"
+DHTEXEC="/usr/local/bin/lol_dht22"
 DHTEXECPARAM="7"
 LOGFILE="/var/log/sensors.log"
-DBFILE="/usr/src/env_sensor/webUI/sensors.db"
+DBFILE="/usr/local/share/webUI/sensors.db"
 SQLITE="/usr/bin/sqlite3"
 MAXTRIES=5
 while true
