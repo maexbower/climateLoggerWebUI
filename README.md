@@ -66,6 +66,7 @@ Here is an example configuration:
     `git clone https://github.com/maexbower/climateLoggerWebUI.git ./climateLog`
     
 ### Config
+#### dht22.py
 At the top of the python script you'll find the following parms:
 
 ```python
@@ -88,6 +89,23 @@ At the top of the python script you'll find the following parms:
 ```
 
 If you change the path of the data.db you have to change the path in the remote.php of the webUI too.
+#### Webserver
+Don't forget to create or change your Webserver configuration. 
+Here is a sample apache2 config file:
+```ApacheConf
+    <VirtualHost *:80>
+     ServerName wetter
+     DocumentRoot /opt/climateLog/webUI/
+     <Directory /opt/climateLog/webUI>
+      Order Allow,Deny
+      Require all granted
+      Allow from all
+     </Directory>
+     ErrorLog ${APACHE_LOG_DIR}/error.log
+     CustomLog ${APACHE_LOG_DIR}/access.log combined
+    </VirtualHost>
+
+```
 
 ### Run
 Always remember that the program needs to be run as root to access the GPIO Port.
