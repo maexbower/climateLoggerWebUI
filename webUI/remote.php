@@ -1,6 +1,7 @@
 <?php
 //print_r($_GET);
 //print_r($_POST);
+
 if(isset($_REQUEST["action"]))
 {
 	$action = htmlspecialchars($_REQUEST['action']);
@@ -8,7 +9,7 @@ if(isset($_REQUEST["action"]))
 	printError(2, "no action given.");
 	die;
 }
-$DATABASEFILE = "sensors.db";
+$DATABASEFILE = "/opt/climateLog/data.db";
 global $database;
 $database = connectSQLite($DATABASEFILE);
 switch ($action) {
@@ -109,6 +110,11 @@ function sql_query($query)
 	while($row = $result->fetch(PDO::FETCH_ASSOC))
 	{
 		$data[] = $row;
+	}
+	if(sizeof($data) == 0)
+	{
+		printError(2, "got no data from SQL");
+		die;
 	}
 	return $data;
 }

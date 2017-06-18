@@ -9,7 +9,7 @@ function showSuccess(Message)
 function showDebug(Message)
 {
 	//Materialize.toast("DEBUG:"+Message, 1000, 'toastDebugClass');
-	//console.log("DEBUG:"+Message);
+	console.log("DEBUG:"+Message);
 }
 function getCurrentValues()
 {
@@ -84,14 +84,13 @@ function createSensorCard(sensor, data)
     card.appendChild(cardText);
     return card;
 }
-function updateCurrentValues(response)
+function updateCurrentValues(data)
 {
-	if(!response)
+	if(!data)
 	{
 		showError("Missing Data");
 		return -1;
 	}
-	var data = jQuery.parseJSON(response.responseText);
     var row = document.getElementById("currentValuesRow");
     if(row)
     {
@@ -118,12 +117,11 @@ function updateCurrentValues(response)
     }
     init();
 }
-function updateHistory(response) {
-    if (!response) {
+function updateHistory(data) {
+    if (!data) {
         showError("Missing Data");
         return -1;
     }
-    var data = jQuery.parseJSON(response.responseText);
     var sensor = data.sensor;
     var shortname = data.shortname;
     var type = data.type;
@@ -195,20 +193,26 @@ function ajaxSuccess(response, action)
 	showLoadingAnimation(false);
     showDebug("ajaxSuccess: Action="+action);
     showDebug("Response="+response.responseText);
-    switch(action){
-        case "current":
-			/*showDebug("Daten erfolgreich abgerufen");*/
-			updateCurrentValues(response);
-            break;
-        case "history":
-			/*showDebug("Daten erfolgreich abgerufen");*/
-            updateHistory(response);
-            break;
-        default:
-            showError("interner Fehler, falsche Action ID:"+action);
-            return;
-            break;
-    }
+	var data = jQuery.parseJSON(response.responseText);
+	if(data.error)
+	{
+		showError("fehler beim Abrufen: "+data.description);
+	}else{		
+		switch(action){
+			case "current":
+				/*showDebug("Daten erfolgreich abgerufen");*/
+				updateCurrentValues(data);
+				break;
+			case "history":
+				/*showDebug("Daten erfolgreich abgerufen");*/
+				updateHistory(data);
+				break;
+			default:
+				showError("interner Fehler, falsche Action ID:"+action);
+				return;
+				break;
+		}
+	}
 }
 function ajaxQuery(action, queryText, optParam)
 {

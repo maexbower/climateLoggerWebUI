@@ -17,7 +17,7 @@ STD_SENSOR_TMP_SHORTNAME = "wb_sunny"
 STD_SENSOR_TMP_NAME = "Temperatur"
 STD_SENSOR_TMP_TYPE = "°C"
 STD_LOG_PATH = "/var/log/dht22"
-STD_DB_PATH = "/opt/cliamteLog/data.db"
+STD_DB_PATH = "/opt/climateLog/data.db"
 STD_DB_MAXRETRY = 5
 STD_TIME_WAIT_SECONDS = 30
 #Init workingVars with std. Values
@@ -44,14 +44,21 @@ def printUsageInfo():
     print("ClimateLogger for Rasperry Pi with DHT22 Sensor")
     print("Usage: ")
     print("\t./dht22.py [--GPIO=] [--LOGPATH=] [--DBPATH=] [--WAIT=] [-h | --help]")
-    print("\t\t--GPIO= defines the GPIO Pin the Sensor is connected to")
-    print("\t\t--LOGPATH= defines the Path (folder) the logfiles are stored in")
+    print("\t\t--SENSOR= defines the used sensor. Supported by the dht lib are DHT22(default) and DHT11")
+    print("\t\t--GPIO= defines the GPIO Pin the Sensor is connected to (default:4)")
+    print("\t\t--LOGPATH= defines the Path (folder) the logfiles are stored in(default:/var/log/dht22)")
     print("\t\t--DBPATH= defines the Path (filename) the database is stored in")
     print("\t\t--WAIT= defines the seconds to wait between measures (need to be above 10 Seconds)")
+    print("\t\t--DB_MAXTRY= defines the maximum count of DB INSERT tries")
+
+
+
+
+
+
     print("\t\t-h |--help prints this help")
 
 def parseArguments(args):
-    args.pop()
     for arg in args:
         if "--help" in arg:
             printUsageInfo()
@@ -60,13 +67,17 @@ def parseArguments(args):
             printUsageInfo()
             exit(0)
         elif "--GPIO=" in arg:
-            PIN = arg.rsplit("=", 1)
+            PIN = int(arg.rsplit("=", 1)[1])
         elif "--LOGPATH=" in arg:
-            LOGPATH = arg.rsplit("=", 1)
+            LOGPATH = arg.rsplit("=", 1)[1]
         elif "--DBPATH=" in arg:
-            DBPATH = arg.rsplit("=", 1)
+            DBPATH = arg.rsplit("=", 1)[1]
         elif "--WAIT=" in arg:
-            TIME_WAIT_SECONDS = arg.rsplit("=", 1)
+            TIME_WAIT_SECONDS = int(arg.rsplit("=", 1)[1])
+        elif "--SENSOR=" in arg:
+            SENSOR = getattr(Adafruit_DHT, str(arg.rsplit("=", 1)[1]))
+        elif "--DB_MAXTRY=" in arg:
+            DB_MAXTRY = int(arg.rsplit("=", 1)[1])
         else:
             print("Unknown parameter:", arg)
 
@@ -113,7 +124,7 @@ def createPath(path):
             createPath(os.path.exists(DBPATH.rsplit(DIRDELIM, 1)[0]))
         else:
             try:
-                os.mkdir(path)
+                os.mkdir(path,777)
                 return True
             except BaseException as e:
                 print("failed to create dir", e)
@@ -152,26 +163,24 @@ def createDBFile():
                             type TEXT
                         );"""
     cursor.execute(createData)
-    db.commit()
     checkData = "SELECT MAX(id) FROM data"
     if not cursor.execute(checkData).fetchall():
         print("failed to create table 'data'")
         deleteDBFile()
         return False
     cursor.execute(createMessungen)
-    db.commit()
     checkMessungen = "SELECT MAX(id) FROM messungen"
     if not cursor.execute(checkMessungen).fetchall():
         print("failed to create table 'data'")
         deleteDBFile()
         return False
     cursor.execute(createSensor)
-    db.commit()
     checkSensor = "SELECT MAX(id) FROM sensor"
     if not cursor.execute(checkSensor).fetchall():
         print("failed to create table 'data'")
         deleteDBFile()
         return False
+    db.commit()
 
     db.close()
     return True
@@ -202,8 +211,11 @@ def writeDataToDB(db, hum, tmp, tries):
     sqlHumSensorExist = "SELECT COUNT(id) FROM sensor WHERE id = " \
                         + str(SENSOR_HUM_DB_ID)\
                         + " ;"
-    returnval = cursor.execute(sqlHumSensorExist).fetchone()
-    if returnval[0] == 0:
+    try:
+        if cursor.execute(sqlHumSensorExist).fetchone()[0] == 0:
+            raise BaseException("Sensor doesn't exist")
+		
+    except BaseException:
         insertSQL = "INSERT INTO sensor(shortname, id, name, type) VALUES ('" \
                     + SENSOR_HUM_SHORTNAME \
                     + "', " \
@@ -213,9 +225,11 @@ def writeDataToDB(db, hum, tmp, tries):
                     + "', '" \
                     + SENSOR_HUM_TYPE \
                     + "');"
-        cursor.execute(insertSQL)
-        sensorReturnval = cursor.execute(sqlHumSensorExist).fetchone()
-        if sensorReturnval[0] == 0:
+        try:
+            cursor.execute(insertSQL)
+            if cursor.execute(sqlHumSensorExist).fetchone()[0] == 0:
+                raise BaseException("Sensor doesn't exist")
+        except BaseException:
             print("failed to insert sensor HUM into DB")
             db.rollback()
             return writeDataToDB(db, hum, tmp, tries)
@@ -224,8 +238,10 @@ def writeDataToDB(db, hum, tmp, tries):
     sqlTmpSensorExist = "SELECT COUNT(id) FROM sensor WHERE id = " \
                         + str(SENSOR_TMP_DB_ID) \
                         + " ;"
-    returnval = cursor.execute(sqlTmpSensorExist).fetchone()
-    if returnval[0] == 0:
+    try:
+        if cursor.execute(sqlTmpSensorExist).fetchone()[0] == 0:
+            raise BaseException("Sensor doesn't exist")
+    except BaseException:
         insertSQL = "INSERT INTO sensor(shortname, id, name, type) VALUES ('" \
                     + SENSOR_TMP_SHORTNAME \
                     + "', '" \
@@ -235,9 +251,11 @@ def writeDataToDB(db, hum, tmp, tries):
                     + "', '" \
                     + SENSOR_TMP_TYPE \
                     + "');"
-        cursor.execute(insertSQL)
-        sensorReturnval = cursor.execute(sqlTmpSensorExist).fetchone()
-        if sensorReturnval[0] == 0:
+        try:
+            cursor.execute(insertSQL)
+            if cursor.execute(sqlTmpSensorExist).fetchone()[0] == 0:
+                raise BaseException("Sensor doesn't exist")
+        except BaseException:
             print("failed to insert sensor TMP into DB")
             db.rollback()
             return writeDataToDB(db, hum, tmp, tries)
