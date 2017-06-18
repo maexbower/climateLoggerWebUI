@@ -94,15 +94,15 @@ Don't forget to create or change your Webserver configuration.
 Here is a sample apache2 config file:
 ```ApacheConf
     <VirtualHost *:80>
-     ServerName wetter
-     DocumentRoot /opt/climateLog/webUI/
-     <Directory /opt/climateLog/webUI>
-      Order Allow,Deny
-      Require all granted
-      Allow from all
-     </Directory>
-     ErrorLog ${APACHE_LOG_DIR}/error.log
-     CustomLog ${APACHE_LOG_DIR}/access.log combined
+        ServerName wetter
+        DocumentRoot /opt/climateLog/webUI/
+        <Directory /opt/climateLog/webUI>
+            Order Allow,Deny
+            Require all granted
+            Allow from all
+        </Directory>
+        ErrorLog ${APACHE_LOG_DIR}/error.log
+        CustomLog ${APACHE_LOG_DIR}/access.log combined
     </VirtualHost>
 
 ```
