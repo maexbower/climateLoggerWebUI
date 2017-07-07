@@ -93,11 +93,17 @@ function getHistory($sensor_shortname) {
 }
 function connectSQLite($path)
 {
-	if (!$db = new PDO("sqlite:$path")) {
-		printError(2, "cannot connect DB: ".$db->errorInfo());
-        die;
-    }
-    return $db; 
+	try{
+		$db = new PDO("sqlite:$path");
+		if (!$db) {
+			printError(2, "cannot connect DB: ".$db->errorInfo());
+        		die;
+    		}
+		return $db;
+	catch(Exception $e){
+		printError(2, "cannot connect DB: cannot open FIle");
+		die;
+	} 
 }
 function sql_query($query)
 {
